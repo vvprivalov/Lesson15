@@ -3,17 +3,16 @@ package Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatServer {
 
-    private final AuthService authService;
     private final List<ClientHandler> clients;
 
     public ChatServer() {
         clients = new ArrayList<>();
-        authService = new SimpleAuthService();
 
         try (ServerSocket serverSocket = new ServerSocket(8189)) {
             System.out.println("СЕРВЕР: Сервер запущен...");
@@ -51,11 +50,6 @@ public class ChatServer {
         System.out.println("СЕРВЕР: Клиент " + clientHandler.getName() + " отключился...");
         clients.remove(clientHandler);
         broadcastClientList();
-    }
-
-    public AuthService getAuthService() {
-
-        return authService;
     }
 
     public boolean isNicknameBusy(String nickname) {

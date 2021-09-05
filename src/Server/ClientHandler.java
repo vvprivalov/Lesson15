@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.*;
 
 public class ClientHandler {
     private final Socket socket;
@@ -34,6 +35,16 @@ public class ClientHandler {
     }
 
     private void authenticate() {
+        Connection connection = null;
+
+
+        try {
+            connection = DriverManager.getConnection("jdbc:sqlite:chatbase.db");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
         while (true) {
             try {
                 final String str = in.readUTF();
@@ -41,7 +52,7 @@ public class ClientHandler {
                     final String[] split = str.split("\\s");
                     final String login = split[1];
                     final String pass = split[2];
-                    final String nickname = server.getAuthService().getNicknameByLoginAndPassword(login, pass);
+                    final String nickname = getNicknameByLoginAndPassword(login, pass, connection);
                     if (nickname != null) {
                         if (!server.isNicknameBusy(nickname)) {
                             sendMessage("/authok " + nickname);
@@ -59,7 +70,25 @@ public class ClientHandler {
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+        }
+    }
+
+    private String getNicknameByLoginAndPassword(String ln, String ps, Connection connection) throws SQLException {
+        String sql = "SELECT * FROM Users WHERE login == ? AND password == ?;";
+        ResultSet rs;
+
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1, ln);
+        preparedStatement.setString(2, ps);
+
+        rs = preparedStatement.executeQuery();
+        if (rs.next()) {
+            return rs.getString(3);
+        } else {
+            return null;
         }
     }
 
