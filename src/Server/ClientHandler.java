@@ -74,6 +74,11 @@ public class ClientHandler {
                 e.printStackTrace();
             }
         }
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private String getNicknameByLoginAndPassword(String ln, String ps, Connection connection) throws SQLException {
