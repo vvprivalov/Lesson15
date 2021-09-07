@@ -23,8 +23,8 @@ public class Controller implements Initializable {
     private DataOutputStream out;
     private String nick;
     private String login;
-    FileWriter fileChatWriter;
-    BufferedReader fileChatReader;
+    private FileWriter fileChatWriter;
+    private FileReader fileChatReader;
 
     @FXML
     private HBox clientPanel;
@@ -115,7 +115,7 @@ public class Controller implements Initializable {
     private void openFileChat() {
         try {
             fileChatWriter = new FileWriter("history_" + login + ".txt", true);
-            fileChatReader = new BufferedReader(new FileReader("history_" + login + ".txt"));
+            fileChatReader = new FileReader("history_" + login + ".txt");
         } catch (IOException e) {
             e.printStackTrace();
         }
