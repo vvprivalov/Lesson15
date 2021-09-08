@@ -24,7 +24,8 @@ public class Controller implements Initializable {
     private String nick;
     private String login;
     private FileWriter fileChatWriter;
-    private FileReader fileChatReader;
+    private BufferedReader fileChatReader;
+    private int countLine;
 
     @FXML
     private HBox clientPanel;
@@ -98,11 +99,9 @@ public class Controller implements Initializable {
                         socket.close();
                         nick = "";
                         fileChatWriter.close();
-                        fileChatReader.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             }).start();
 
@@ -113,9 +112,19 @@ public class Controller implements Initializable {
     }
 
     private void openFileChat() {
+        String strLine = "";
         try {
             fileChatWriter = new FileWriter("history_" + login + ".txt", true);
-            fileChatReader = new FileReader("history_" + login + ".txt");
+            fileChatReader = new BufferedReader(new FileReader("history_" + login + ".txt"));
+            while (true) {
+                strLine = fileChatReader.readLine();
+                if (strLine != null) {
+                    textArea.appendText(strLine + "\n");
+                } else {
+                    break;
+                }
+            }
+            fileChatReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,9 +162,6 @@ public class Controller implements Initializable {
         try {
             final String msg = textField.getText();
             System.out.println("CLIENT: Send message to server: " + msg);
-            if (!msg.startsWith("/end")) {
-                fileChatWriter.append(msg + "\n");
-            }
             out.writeUTF(msg);
             textField.clear();
             textField.requestFocus();

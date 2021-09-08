@@ -36,8 +36,6 @@ public class ClientHandler {
 
     private void authenticate() {
         Connection connection = null;
-
-
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:chatbase.db");
         } catch (SQLException e) {
