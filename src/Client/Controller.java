@@ -24,8 +24,6 @@ public class Controller implements Initializable {
     private String nick;
     private String login;
     private FileWriter fileChatWriter;
-    private BufferedReader fileChatReader;
-    private int countLine;
 
     @FXML
     private HBox clientPanel;
@@ -112,10 +110,10 @@ public class Controller implements Initializable {
     }
 
     private void openFileChat() {
-        String strLine = "";
+        String strLine;
         try {
             fileChatWriter = new FileWriter("history_" + login + ".txt", true);
-            fileChatReader = new BufferedReader(new FileReader("history_" + login + ".txt"));
+            BufferedReader fileChatReader = new BufferedReader(new FileReader("history_" + login + ".txt"));
             while (true) {
                 strLine = fileChatReader.readLine();
                 if (strLine != null) {
