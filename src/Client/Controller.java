@@ -1,8 +1,6 @@
 package Client;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
 import java.util.*;
@@ -24,6 +22,8 @@ public class Controller implements Initializable {
     private DataInputStream in;
     private DataOutputStream out;
     private String nick;
+    private String login;
+    private FileWriter fileChatWriter;
 
     @FXML
     private HBox clientPanel;
@@ -59,6 +59,10 @@ public class Controller implements Initializable {
                         System.out.println("CLIENT: Received message: " + msgAuth);
                         if (msgAuth.startsWith("/authok")) {
                             setAuth(true);
+
+                            // Метод для открытие файла для записи и чтения сохранненого чата
+                            openFileChat();
+
                             nick = msgAuth.split("\\s")[1];
                             textArea.appendText("Успешная авторизация под ником " + nick + "\n");
                             break;
@@ -82,6 +86,7 @@ public class Controller implements Initializable {
                             continue;
                         }
                         textArea.appendText(msgFromServer + "\n");
+                        fileChatWriter.append(msgFromServer + "\n");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -91,10 +96,10 @@ public class Controller implements Initializable {
                         setAuth(false);
                         socket.close();
                         nick = "";
+                        fileChatWriter.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }
             }).start();
 
@@ -102,6 +107,26 @@ public class Controller implements Initializable {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private void openFileChat() {
+        String strLine;
+        try {
+            fileChatWriter = new FileWriter("history_" + login + ".txt", true);
+            BufferedReader fileChatReader = new BufferedReader(new FileReader("history_" + login + ".txt"));
+            while (true) {
+                strLine = fileChatReader.readLine();
+                if (strLine != null) {
+                    textArea.appendText(strLine + "\n");
+                } else {
+                    break;
+                }
+            }
+            fileChatReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void setAuth(boolean isAuthSuccess) {
@@ -122,6 +147,7 @@ public class Controller implements Initializable {
 
         try {
             System.out.println("CLIENT: Send auth message");
+            login = loginField.getText();
             out.writeUTF("/auth " + loginField.getText() + " " + passwordField.getText());
             loginField.clear();
             passwordField.clear();

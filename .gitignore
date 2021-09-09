@@ -1,4 +1,9 @@
-/JavaFxApplication.iml
-pom.xml
+*.iml
+*.xml
+.idea/
 
+.target/
+
+.out/
+*.txt
 
